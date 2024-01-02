@@ -9,7 +9,7 @@ import SwiftUI
 
 extension View {
     func hSpacer(_ alignment: Alignment) -> some View {
-        self.frame(maxWidth: /*@START_MENU_TOKEN@*/.infinity/*@END_MENU_TOKEN@*/,alignment: alignment)
+        self.frame(maxWidth: .infinity,alignment: alignment)
     }
 
     func vSpacer(_ alignment: Alignment) -> some View {
