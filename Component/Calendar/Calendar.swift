@@ -29,7 +29,7 @@ struct CalendarView: View {
                                 .tag(index)
                         }
                     }
-                    .tabViewStyle(PageTabViewStyle())
+                    .tabViewStyle(.page(indexDisplayMode: .never))
                     .hSpacer(.center)
                     .frame(height: 75)
                     .onChange(of: weekIndex, {
@@ -149,8 +149,8 @@ struct CalendarView: View {
                         .foregroundStyle(isSameDay(day.date, self.currentDate) ? .white : .gray)
                         .frame(width: 36,height: 36)
                         .background(content:{
-                            let current = Calendar.current
-                            if current.isDate(day.date,inSameDayAs: currentDate){
+
+                            if isSameDay(day.date, currentDate){
                                 Circle()
                                     .fill(.blue)
                                     .matchedGeometryEffect(id:"TABINDICATOR", in: animation)
@@ -163,15 +163,15 @@ struct CalendarView: View {
                                     .offset(y:23)
                             }
                         })
-                        .contentShape(.rect)
-                        .onTapGesture {
-                            withAnimation(.snappy) {
-                                currentDate = day.date
-                            }
-                        }
                         .background(.white.shadow(.drop(radius: 1)), in: .circle)
                 }
                 .hSpacer(.center)
+                .contentShape(.rect)
+                .onTapGesture {
+                    withAnimation(.interactiveSpring) {
+                        currentDate = day.date
+                    }
+                }
             }
         }
         

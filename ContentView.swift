@@ -19,6 +19,29 @@ struct ContentView: View {
     }
 }
 
+struct TestView: View {
+    @State private var selectedTab: Int = 0
+
+    var body: some View {
+        TabView(selection: $selectedTab) {
+            Text("First View")
+                .tabItem {
+                    Image(systemName: "1.square.fill")
+                    Text("First")
+                }
+                .tag(0)
+
+            Text("Second View")
+                .tabItem {
+                    Image(systemName: "2.square.fill")
+                    Text("Second")
+                }
+                .tag(1)
+        }
+    }
+}
+
 #Preview {
-    CalendarView()
+    TestView()
+        .tabViewStyle(PageTabViewStyle())
 }
