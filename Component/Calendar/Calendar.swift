@@ -11,8 +11,7 @@ struct CalendarView: View {
     @State private var currentDate: Date = .init()
     @State private var weekDays: [[Date.WeekDay]] = []
     @State private var weekIndex: Int = 1
-    @State private var weekPreIndex: Int = 1
-    @State private var moveCalendar: Bool = false
+    @State private var moveWeek: Bool = true
 
     @Namespace private var animation
     var body: some View {
@@ -70,49 +69,50 @@ struct CalendarView: View {
         //.tabViewStyle(PageTabViewStyle())
         .hSpacer(.center)
         .frame(height: 75)
-        .onChange(of: weekIndex, {
-            if !self.moveCalendar {
-                print(self.currentDate)
-                self.moveCalendar.toggle()
-                var addDay: Int
-                //page to previous week
-                if self.weekPreIndex - self.weekIndex > 0 {
-                    addDay = -7
-                } else {
-                    addDay = 7
-                }
-                withAnimation(.snappy) {
-                    let calendar = Calendar.current
-                    if let priviousWeekDay = calendar.date(byAdding: .day, value: addDay,to:  self.currentDate) {
-                        self.currentDate = priviousWeekDay
-                    }
-
-                }
-                //save previous index of tab
-                self.weekPreIndex = self.weekIndex
-                //page to previous week
-                if addDay < 0 {
-                    var week: [Date.WeekDay] = self.currentDate.fetchPreviousWeek()
-                    self.weekDays.removeLast()
-                    self.weekDays.insert(week, at: 0)
-
-                } else {
-                    var week: [Date.WeekDay] = self.currentDate.fetchNextWeek()
-                    self.weekDays.removeFirst()
-                    self.weekDays.append(week)
-                }
-                print(self.weekDays[0][0].date)
-                print(self.weekDays[1][0].date)
-                print(self.weekDays[2][0].date)
-                print(self.currentDate)
-                self.weekIndex = 1
-                print(self.weekIndex)
-                self.moveCalendar.toggle()
-            }
-
+        .onChange(of: weekIndex, {oldValue,newValue in
+            CompactCelendarChange(oldValue, newValue)
         })
     }
 
+    func CompactCelendarChange(_ oldValue: Int,_ newValue: Int) {
+        guard moveWeek else {
+            moveWeek = true
+            return
+        }
+        print("=======")
+        print(self.currentDate)
+        print(oldValue,newValue)
+        var addDay: Int
+        //page to previous week
+        if oldValue - newValue > 0 {
+            addDay = -7
+        } else {
+            addDay = 7
+        }
+        withAnimation(.snappy) {
+            let calendar = Calendar.current
+            if let priviousWeekDay = calendar.date(byAdding: .day, value: addDay,to:  self.currentDate) {
+                self.currentDate = priviousWeekDay
+            }
+
+        }
+        //page to previous week
+        if addDay < 0 {
+            let week: [Date.WeekDay] = self.currentDate.fetchPreviousWeek()
+            self.weekDays.removeLast()
+            self.weekDays.insert(week, at: 0)
+        } else {
+            let week: [Date.WeekDay] = self.currentDate.fetchNextWeek()
+            self.weekDays.removeFirst()
+            self.weekDays.append(week)
+        }
+        DispatchQueue.main.async {
+            moveWeek = false
+            self.weekIndex = 1
+        }
+        print("=======")
+
+    }
     @ViewBuilder
     func CompactCalendarTabView(_ weekDay: [Date.WeekDay]) -> some View{
         HStack(spacing:5){
