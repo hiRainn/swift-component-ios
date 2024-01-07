@@ -6,3 +6,16 @@
 //
 
 import SwiftUI
+
+struct TimeLineView: View {
+    var body: some View {
+        VStack{
+
+        }
+    }
+}
+
+#Preview {
+    TimeLineView()
+}
+
