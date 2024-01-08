@@ -8,10 +8,19 @@
 import SwiftUI
 
 struct TimeLineView: View {
+    @State private var dataList: [timeLineData] = []
+
     var body: some View {
         VStack{
 
         }
+        .onAppear{
+            onAppearEvent()
+        }
+    }
+
+    func onAppearEvent() {
+
     }
 }
 
