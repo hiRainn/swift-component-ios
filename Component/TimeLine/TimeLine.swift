@@ -20,7 +20,7 @@ struct TimeLineView: View {
     }
 
     func onAppearEvent() {
-
+        self.dataList = []
     }
 }
 
