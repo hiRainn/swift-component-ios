@@ -12,20 +12,20 @@ extension Date {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd"
         if let date = dateFormatter.date(from: dateString) {
-            return date // 打印转化后的日期
+            return date
         } else {
-            print("日期格式不正确")
+            print("date format error")
             return nil
         }
     }
 
-    static func setTime(_ dateString: String,_ format: String) -> Data? {
+    static func setTime(_ dateString: String,_ format: String) -> Date? {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = format
         if let date = dateFormatter.date(from: dateString) {
-            return date // 打印转化后的日期
+            return date
         } else {
-            print("日期格式不正确")
+            print("date format error")
             return nil
         }
     }
