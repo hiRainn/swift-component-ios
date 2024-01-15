@@ -19,6 +19,17 @@ extension Date {
         }
     }
 
+    static func setTime(_ dateString: String,_ format: String) -> Data? {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = format
+        if let date = dateFormatter.date(from: dateString) {
+            return date // 打印转化后的日期
+        } else {
+            print("日期格式不正确")
+            return nil
+        }
+    }
+
     func format(_ format: String) -> String {
         let dataFormatter = DateFormatter()
         dataFormatter.dateFormat = format
