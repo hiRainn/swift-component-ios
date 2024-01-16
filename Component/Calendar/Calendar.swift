@@ -43,7 +43,7 @@ struct CalendarView: View {
     @ViewBuilder
     func CalendarHeader() -> some View {
         HStack(spacing: 5){
-            //extenxion 实现的Date函数format
+            //extenxion function in ViewExtension
             Text(currentDate.format("MMMM")).foregroundStyle(.blue)
             Text(currentDate.format("YYYY")).foregroundStyle(.gray)
             Spacer()
@@ -112,9 +112,9 @@ struct CalendarView: View {
     }
     @ViewBuilder
     func CompactCalendarTabView(_ weekDay: [Date.WeekDay]) -> some View{
-        HStack(spacing:5){
+        HStack(spacing:0){
             ForEach(weekDay) { day in
-                VStack(spacing: 2){
+                VStack(spacing: 8){
                     Text(day.date.format("E"))
                         .font(.callout)
                         .fontWeight(.medium)
@@ -125,7 +125,7 @@ struct CalendarView: View {
                         .fontWeight(.bold)
                         .textScale(.secondary)
                         .foregroundStyle(isSameDay(day.date, self.currentDate) ? .white : .gray)
-                        .frame(width: 36,height: 36)
+                        .frame(width: 30,height: 30)
                         .background(content:{
 
                             if isSameDay(day.date, currentDate){
@@ -137,16 +137,18 @@ struct CalendarView: View {
                             if day.data != nil {
                                 Circle()
                                     .fill(.red)
-                                    .frame(width: 6,height: 6)
-                                    .offset(y:23)
+                                    .frame(width: 5,height: 5)
+                                    .vSpacer(.bottom)
+                                    .offset(y:8)
                             }
-                        })
+                        }
+                        )
                         .background(.white.shadow(.drop(radius: 1)), in: .circle)
                 }
                 .hSpacer(.center)
                 .contentShape(.rect)
                 .onTapGesture {
-                    withAnimation(.interactiveSpring) {
+                    withAnimation(.snappy) {
                         currentDate = day.date
                     }
                 }
@@ -172,48 +174,18 @@ struct CalendarView: View {
 
     func onAppearEvent() {
         if self.weekDays.isEmpty {
-            let preWeek = self.currentDate.fetchPreviousWeek()
-            if !preWeek.isEmpty {
-                self.weekDays.append(preWeek)
-            }
             let currentWeek = Date.fetchWeek()
-            self.weekDays.append(currentWeek)
-            let nextWeek = self.currentDate.fetchNextWeek()
-            if !nextWeek.isEmpty {
-                self.weekDays.append(nextWeek)
+
+            if let firstDate = currentWeek.first?.data {
+
+            }
+
+            if let lastDate = currentWeek.last?.data {
+                
             }
         }
 
-        //create same data in weekday
-        for i in 0..<self.weekDays.count {
-            let calendar = Calendar.current
-            for (index,value) in self.weekDays[i].enumerated() {
-                //add today datas
-                if isSameDay(value.date, self.currentDate) {
-                    self.weekDays[i][index].data = "1"
-                }
 
-                //add 2 day's after datas
-                if let day2after = calendar.date(byAdding: .day, value: 2, to: self.currentDate) {
-                    if isSameDay(value.date, day2after) {
-                        self.weekDays[i][index].data = "2"
-                    }
-                }
-                //add 2 day's ago datas
-                if let day2ago = calendar.date(byAdding: .day, value: -2, to: self.currentDate) {
-                    if isSameDay(value.date, day2ago) {
-                        self.weekDays[i][index].data = "2"
-                    }
-                }
-                //add 1 week's after datas
-                if let dayWeekAfter = calendar.date(byAdding: .day, value: 10, to: self.currentDate) {
-                    if isSameDay(value.date, dayWeekAfter) {
-                        self.weekDays[i][index].data = "2"
-                    }
-                }
-
-            }
-        }
     }
 
     func isSameDay(_ day1: Date, _ day2: Date) -> Bool {
