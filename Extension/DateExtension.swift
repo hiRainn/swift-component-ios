@@ -19,13 +19,13 @@ extension Date {
         }
     }
 
-    static func setTime(_ dateString: String,_ format: String) -> Date? {
+    static func setTime(_ timeString: String) -> Date? {
         let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = format
-        if let date = dateFormatter.date(from: dateString) {
+        dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+        if let date = dateFormatter.date(from: timeString) {
             return date
         } else {
-            print("date format error")
+            print("time format error")
             return nil
         }
     }

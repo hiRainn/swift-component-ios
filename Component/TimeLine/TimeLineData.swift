@@ -13,7 +13,8 @@ struct timeLineData: Identifiable {
     var title: String
     var content: String
     var isFinish: Bool
-    var tagColor: String
+    var finishAt: Date? = nil
+    var tagColor: Color
 }
 
 

@@ -79,9 +79,6 @@ struct CalendarView: View {
             moveWeek = true
             return
         }
-        print("=======")
-        print(self.currentDate)
-        print(oldValue,newValue)
         var addDay: Int
         //page to previous week
         if oldValue - newValue > 0 {
