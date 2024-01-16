@@ -91,7 +91,6 @@ struct CalendarView: View {
             if let priviousWeekDay = calendar.date(byAdding: .day, value: addDay,to:  self.currentDate) {
                 self.currentDate = priviousWeekDay
             }
-
         }
         //page to previous week
         if addDay < 0 {
@@ -107,7 +106,6 @@ struct CalendarView: View {
             moveWeek = false
             self.weekIndex = 1
         }
-        print("=======")
 
     }
     @ViewBuilder
@@ -176,13 +174,9 @@ struct CalendarView: View {
         if self.weekDays.isEmpty {
             let currentWeek = Date.fetchWeek()
 
-            if let firstDate = currentWeek.first?.data {
-
-            }
-
-            if let lastDate = currentWeek.last?.data {
-                
-            }
+            weekDays.append(currentDate.fetchPreviousWeek())
+            weekDays.append(currentWeek)
+            weekDays.append(currentDate.fetchNextWeek())
         }
 
 

@@ -37,40 +37,20 @@ extension Date {
 
     //fetch previous weekdays
     func fetchPreviousWeek() -> [WeekDay] {
-        var week: [WeekDay] = []
         let calendar = Calendar.current
-        if let priviousWeekDay = calendar.date(byAdding: .day, value: -7, to: self) {
-            let startPriviousWeek = calendar.startOfDay(for: priviousWeekDay)
-            let previousWeekForDate = calendar.dateInterval(of: .weekOfMonth, for: startPriviousWeek)
-            guard let startOfWeek = previousWeekForDate?.start else {
-                return []
-            }
-            for index in 0..<7 {
-                if let weekDay = calendar.date(byAdding: .day,value: index ,to: startOfWeek) {
-                    week.append(.init(date: weekDay))
-                }
-            }
+        guard let priviousWeekDay = calendar.date(byAdding: .day, value: -7, to: self) else {
+            return []
         }
-        return week
+        return Date.fetchWeek(priviousWeekDay)
     }
 
     //fetch next weekdays
     func fetchNextWeek() -> [WeekDay] {
-        var week: [WeekDay] = []
         let calendar = Calendar.current
-        if let nextWeekDay = calendar.date(byAdding: .day, value: 7, to: self) {
-            let nextPriviousWeek = calendar.startOfDay(for: nextWeekDay)
-            let NextWeekForDate = calendar.dateInterval(of: .weekOfMonth, for: nextPriviousWeek)
-            guard let startOfWeek = NextWeekForDate?.start else {
-                return []
-            }
-            for index in 0..<7 {
-                if let weekDay = calendar.date(byAdding: .day,value: index ,to: startOfWeek) {
-                    week.append(.init(date: weekDay))
-                }
-            }
+        guard let nextWeekDay = calendar.date(byAdding: .day, value: 7, to: self) else {
+            return []
         }
-        return week
+        return Date.fetchWeek(nextWeekDay)
     }
 
     struct WeekDay: Identifiable {
