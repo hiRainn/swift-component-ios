@@ -11,11 +11,13 @@ struct CalendarView: View {
     @State private var currentDate: Date = .init()
     @State private var weekDays: [[Date.WeekDay]] = []
     @State private var weekIndex: Int = 1
-    @State private var moveWeek: Bool = true
+    @State private var createWeek: Bool = false
+    @State private var pageNext: Bool = false
 
     @Namespace private var animation
     var body: some View {
-        VStack(alignment: .center, content: {
+
+        VStack(alignment: .center, spacing: 0,content: {
             //header
             CalendarHeader()
             VStack(content: {
@@ -23,26 +25,28 @@ struct CalendarView: View {
                     FullCalendarView()
                 } else {
                     CompactCalendarView()
-
                 }
             })
             .onAppear{
                 onAppearEvent()
             }
+            .background(.white)
+            Spacer()
+            if currentDayHaveData() {
+                dataView()
+            } else {
+                Text("no data")
+            }
+            Spacer()
         })
-        Spacer()
-        if currentDayHaveData() {
-            dataView()
-        } else {
-            Text("no data")
-        }
-        Spacer()
+        .background(Color(red: 248/255, green: 248/255, blue: 255/255))
+
 
     }
 
     @ViewBuilder
     func CalendarHeader() -> some View {
-        HStack(spacing: 5){
+        HStack(){
             //extenxion function in ViewExtension
             Text(currentDate.format("MMMM")).foregroundStyle(.blue)
             Text(currentDate.format("YYYY")).foregroundStyle(.gray)
@@ -52,62 +56,75 @@ struct CalendarView: View {
                     self.showFullCalendar.toggle()
                 }
         }
-        .padding()
+        .padding(.leading,10)
+        .padding(.top,10)
+        .padding(.trailing,10)
+        .background(.white)
     }
 
     @ViewBuilder
     func CompactCalendarView() -> some View {
-        TabView(selection: self.$weekIndex){
-            //fetch previos weekday
-            ForEach(self.weekDays.indices,id: \.self) {index in
-                CompactCalendarTabView(self.weekDays[index])
-                    .tag(index)
+        VStack{
+            TabView(selection: self.$weekIndex){
+                //fetch previos weekday
+                ForEach(self.weekDays.indices,id: \.self) {index in
+                    CompactCalendarTabView(self.weekDays[index])
+                        .padding(.horizontal,8)
+                        .tag(index)
+                }
             }
+            .tabViewStyle(.page(indexDisplayMode: .never))
+            //cause height of this tabview is too low,using PageTabViewStyle will result in overlapping styles,so we need to hidden the indicator
+            //.tabViewStyle(PageTabViewStyle())
+            .frame(height:100)
+            .padding(.horizontal,-8)
         }
-        .tabViewStyle(.page(indexDisplayMode: .never))
-        //cause height of this tabview is too low,using PageTabViewStyle will result in overlapping styles,so we need to hidden the indicator
-        //.tabViewStyle(PageTabViewStyle())
-        .hSpacer(.center)
-        .frame(height: 75)
-        .onChange(of: weekIndex, {oldValue,newValue in
-            CompactCelendarChange(oldValue, newValue)
+        .padding(.horizontal,8)
+        .onChange(of: weekIndex, initial: false, {oldValue,newValue in
+            //creating when it reaches first/last page
+            if newValue == 0 || newValue == (weekDays.count - 1) {
+                if (newValue - oldValue) > 0 {
+                    pageNext = true
+                } else {
+                    pageNext = false
+                }
+                createWeek = true
+            }
         })
+
     }
 
-    func CompactCelendarChange(_ oldValue: Int,_ newValue: Int) {
-        guard moveWeek else {
-            moveWeek = true
-            return
-        }
-        var addDay: Int
-        //page to previous week
-        if oldValue - newValue > 0 {
-            addDay = -7
-        } else {
-            addDay = 7
-        }
-        withAnimation(.snappy) {
-            let calendar = Calendar.current
-            if let priviousWeekDay = calendar.date(byAdding: .day, value: addDay,to:  self.currentDate) {
-                self.currentDate = priviousWeekDay
+    func CelendarPageChange() {
+        //week page change
+        if weekDays.indices.contains(weekIndex) {
+            if let firstDate =  weekDays[weekIndex].first?.date, weekIndex == 0 {
+                weekDays.insert(firstDate.fetchPreviousWeek(), at: 0)
+                weekDays.removeLast()
+                weekIndex = 1
+            }
+
+            if let lastDate =  weekDays[weekIndex].last?.date, weekIndex == (weekDays.count - 1) {
+                weekDays.append(lastDate.fetchNextWeek())
+                weekDays.removeFirst()
+                weekIndex = weekDays.count - 2
+
             }
         }
-        //page to previous week
-        if addDay < 0 {
-            let week: [Date.WeekDay] = self.currentDate.fetchPreviousWeek()
-            self.weekDays.removeLast()
-            self.weekDays.insert(week, at: 0)
-        } else {
-            let week: [Date.WeekDay] = self.currentDate.fetchNextWeek()
-            self.weekDays.removeFirst()
-            self.weekDays.append(week)
-        }
-        DispatchQueue.main.async {
-            moveWeek = false
-            self.weekIndex = 1
-        }
+        //month page change
 
+        //change current day
+        if showFullCalendar {
+
+        } else {
+            if pageNext {
+                currentDate = currentDate.getSomeDayAfter(7)!
+            } else {
+                currentDate = currentDate.getSomeDayAfter(-7)!
+            }
+        }
+        print(currentDate)
     }
+
     @ViewBuilder
     func CompactCalendarTabView(_ weekDay: [Date.WeekDay]) -> some View{
         HStack(spacing:0){
@@ -136,14 +153,14 @@ struct CalendarView: View {
                                 Circle()
                                     .fill(.red)
                                     .frame(width: 5,height: 5)
-                                    .vSpacer(.bottom)
+                                    .vSpacing(.bottom)
                                     .offset(y:8)
                             }
                         }
                         )
                         .background(.white.shadow(.drop(radius: 1)), in: .circle)
                 }
-                .hSpacer(.center)
+                .hSpacing(.center)
                 .contentShape(.rect)
                 .onTapGesture {
                     withAnimation(.snappy) {
@@ -152,7 +169,21 @@ struct CalendarView: View {
                 }
             }
         }
-        
+        .background{
+            GeometryReader {
+                let minX = $0.frame(in: .global).minX
+                Color.clear
+                    .preference(key: OffsetKey.self, value: minX)
+                    .onPreferenceChange(OffsetKey.self) { value in
+                        //when the offset reaches 8 and the createWeek is true
+                        if value.rounded() == 8 && createWeek {
+                            CelendarPageChange()
+                            createWeek = false
+                        }
+                    }
+            }
+        }
+
     }
 
     @ViewBuilder
@@ -173,7 +204,6 @@ struct CalendarView: View {
     func onAppearEvent() {
         if self.weekDays.isEmpty {
             let currentWeek = Date.fetchWeek()
-
             weekDays.append(currentDate.fetchPreviousWeek())
             weekDays.append(currentWeek)
             weekDays.append(currentDate.fetchNextWeek())

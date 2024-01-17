@@ -35,5 +35,10 @@ extension Date {
         dataFormatter.dateFormat = format
         return dataFormatter.string(from: self)
     }
+
+    func getSomeDayAfter(_ day: Int) -> Date? {
+        let calendar = Calendar.current
+        return calendar.date(byAdding: .day, value: day, to: self)
+    }
 }
 

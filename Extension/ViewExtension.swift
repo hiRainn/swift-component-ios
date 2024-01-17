@@ -8,11 +8,11 @@
 import SwiftUI
 
 extension View {
-    func hSpacer(_ alignment: Alignment) -> some View {
+    func hSpacing(_ alignment: Alignment) -> some View {
         self.frame(maxWidth: .infinity,alignment: alignment)
     }
 
-    func vSpacer(_ alignment: Alignment) -> some View {
+    func vSpacing(_ alignment: Alignment) -> some View {
         self.frame(maxHeight: /*@START_MENU_TOKEN@*/.infinity/*@END_MENU_TOKEN@*/,alignment: alignment)
     }
 }
