@@ -9,14 +9,14 @@ import SwiftUI
 struct CalendarView: View {
     @State private var showFullCalendar = false
     @State private var currentDate: Date = .init()
-    @State private var weekDays: [[Date.WeekDay]] = []
+    @State private var weekDays: [[Date.CalendarDay]] = []
+    @State private var MonthDays: [[[Date.CalendarDay]]] = []
     @State private var weekIndex: Int = 1
     @State private var createWeek: Bool = false
     @State private var pageNext: Bool = false
 
     @Namespace private var animation
     var body: some View {
-
         VStack(alignment: .center, spacing: 0,content: {
             //header
             CalendarHeader()
@@ -78,20 +78,89 @@ struct CalendarView: View {
             //.tabViewStyle(PageTabViewStyle())
             .frame(height:100)
             .padding(.horizontal,-8)
+            .onChange(of: weekIndex, initial: false, {oldValue,newValue in
+                //creating when it reaches first/last page
+                if newValue == 0 || newValue == (weekDays.count - 1) {
+                    if (newValue - oldValue) > 0 {
+                        pageNext = true
+                    } else {
+                        pageNext = false
+                    }
+                    createWeek = true
+                }
+            })
         }
         .padding(.horizontal,8)
-        .onChange(of: weekIndex, initial: false, {oldValue,newValue in
-            //creating when it reaches first/last page
-            if newValue == 0 || newValue == (weekDays.count - 1) {
-                if (newValue - oldValue) > 0 {
-                    pageNext = true
-                } else {
-                    pageNext = false
-                }
-                createWeek = true
-            }
-        })
 
+
+    }
+
+    @ViewBuilder
+    func CompactCalendarTabView(_ weekDay: [Date.CalendarDay]) -> some View{
+        HStack(spacing:0){
+            ForEach(weekDay) { day in
+                VStack(spacing: 8){
+                    Text(day.date.format("E"))
+                        .font(.callout)
+                        .fontWeight(.medium)
+                        .textScale(.secondary)
+                        .foregroundStyle(.gray)
+                    Text(day.date.format("dd"))
+                        .font(.title2)
+                        .fontWeight(.bold)
+                        .textScale(.secondary)
+                        .foregroundStyle(isSameDay(day.date, self.currentDate) ? .white : .gray)
+                        .frame(width: 30,height: 30)
+                        .background(content:{
+                            if isSameDay(day.date, currentDate){
+                                Circle()
+                                    .fill(.blue)
+                                    .matchedGeometryEffect(id:"TABINDICATOR", in: animation)
+                            }
+
+                            if day.data != nil {
+                                Circle()
+                                    .fill(.red)
+                                    .frame(width: 5,height: 5)
+                                    .vSpacing(.bottom)
+                                    .offset(y:8)
+                            }
+                        }
+                        )
+                        .background(.white.shadow(.drop(radius: 1)), in: .circle)
+                }
+                .hSpacing(.center)
+                .contentShape(.rect)
+                .onTapGesture {
+                    print(1)
+                    withAnimation(.snappy) {
+                        currentDate = day.date
+                    }
+                }
+            }
+        }
+        .background{
+            GeometryReader {
+                let minX = $0.frame(in: .global).minX
+                Color.clear
+                    .preference(key: OffsetKey.self, value: minX)
+                    .onPreferenceChange(OffsetKey.self) { value in
+                        //when the offset reaches 8 and the createWeek is true
+                        if value.rounded() == 8 && createWeek {
+                            CelendarPageChange()
+                            createWeek = false
+                        }
+                    }
+            }
+        }
+
+    }
+
+    @ViewBuilder
+    func FullCalendarView() -> some View{
+        VStack(alignment: .leading,spacing: 6){
+            Text("full")
+        }
     }
 
     func CelendarPageChange() {
@@ -122,75 +191,7 @@ struct CalendarView: View {
                 currentDate = currentDate.getSomeDayAfter(-7)!
             }
         }
-        print(currentDate)
-    }
-
-    @ViewBuilder
-    func CompactCalendarTabView(_ weekDay: [Date.WeekDay]) -> some View{
-        HStack(spacing:0){
-            ForEach(weekDay) { day in
-                VStack(spacing: 8){
-                    Text(day.date.format("E"))
-                        .font(.callout)
-                        .fontWeight(.medium)
-                        .textScale(.secondary)
-                        .foregroundStyle(.gray)
-                    Text(day.date.format("dd"))
-                        .font(.title2)
-                        .fontWeight(.bold)
-                        .textScale(.secondary)
-                        .foregroundStyle(isSameDay(day.date, self.currentDate) ? .white : .gray)
-                        .frame(width: 30,height: 30)
-                        .background(content:{
-
-                            if isSameDay(day.date, currentDate){
-                                Circle()
-                                    .fill(.blue)
-                                    .matchedGeometryEffect(id:"TABINDICATOR", in: animation)
-                            }
-
-                            if day.data != nil {
-                                Circle()
-                                    .fill(.red)
-                                    .frame(width: 5,height: 5)
-                                    .vSpacing(.bottom)
-                                    .offset(y:8)
-                            }
-                        }
-                        )
-                        .background(.white.shadow(.drop(radius: 1)), in: .circle)
-                }
-                .hSpacing(.center)
-                .contentShape(.rect)
-                .onTapGesture {
-                    withAnimation(.snappy) {
-                        currentDate = day.date
-                    }
-                }
-            }
-        }
-        .background{
-            GeometryReader {
-                let minX = $0.frame(in: .global).minX
-                Color.clear
-                    .preference(key: OffsetKey.self, value: minX)
-                    .onPreferenceChange(OffsetKey.self) { value in
-                        //when the offset reaches 8 and the createWeek is true
-                        if value.rounded() == 8 && createWeek {
-                            CelendarPageChange()
-                            createWeek = false
-                        }
-                    }
-            }
-        }
-
-    }
-
-    @ViewBuilder
-    func FullCalendarView() -> some View{
-        VStack(alignment: .leading,spacing: 6){
-            Text("full")
-        }
+//        print(currentDate)
     }
 
     @ViewBuilder
