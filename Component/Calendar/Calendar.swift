@@ -10,7 +10,7 @@ struct CalendarView: View {
     @State private var showFullCalendar = false
     @State private var currentDate: Date = .init()
     @State private var weekDays: [[Date.CalendarDay]] = []
-    @State private var MonthDays: [[[Date.CalendarDay]]] = []
+    @State private var monthDays: [[[Date.CalendarDay]]] = []
     @State private var weekIndex: Int = 1
     @State private var createWeek: Bool = false
     @State private var pageNext: Bool = false
@@ -74,8 +74,6 @@ struct CalendarView: View {
                 }
             }
             .tabViewStyle(.page(indexDisplayMode: .never))
-            //cause height of this tabview is too low,using PageTabViewStyle will result in overlapping styles,so we need to hidden the indicator
-            //.tabViewStyle(PageTabViewStyle())
             .frame(height:100)
             .padding(.horizontal,-8)
             .onChange(of: weekIndex, initial: false, {oldValue,newValue in
@@ -91,8 +89,6 @@ struct CalendarView: View {
             })
         }
         .padding(.horizontal,8)
-
-
     }
 
     @ViewBuilder
@@ -132,7 +128,6 @@ struct CalendarView: View {
                 .hSpacing(.center)
                 .contentShape(.rect)
                 .onTapGesture {
-                    print(1)
                     withAnimation(.snappy) {
                         currentDate = day.date
                     }
@@ -158,8 +153,95 @@ struct CalendarView: View {
 
     @ViewBuilder
     func FullCalendarView() -> some View{
-        VStack(alignment: .leading,spacing: 6){
-            Text("full")
+        VStack{
+            TabView(selection: self.$weekIndex){
+                //fetch previos weekday
+                ForEach(self.monthDays.indices,id: \.self) {index in
+                    FullCalendarTabView(self.monthDays[index])
+                        .padding(.horizontal,8)
+                        .tag(index)
+                }
+            }
+            .tabViewStyle(.page(indexDisplayMode: .never))
+            .frame(height:288)
+            .padding(.horizontal,-8)
+            .onChange(of: weekIndex, initial: false, {oldValue,newValue in
+                //creating when it reaches first/last page
+                if newValue == 0 || newValue == (weekDays.count - 1) {
+                    if (newValue - oldValue) > 0 {
+                        pageNext = true
+                    } else {
+                        pageNext = false
+                    }
+                    createWeek = true
+                }
+            })
+        }
+        .padding(.horizontal,8)
+    }
+
+    @ViewBuilder
+    func FullCalendarTabView(_ monthDay: [[Date.CalendarDay]]) ->some View {
+        VStack{
+            ForEach(0..<monthDay.count, id: \.self) { index in
+                HStack(spacing:0){
+                    ForEach(monthDay[index]) { day in
+                        VStack(spacing: 8){
+                            if index == 0 {
+                                Text(day.date.format("E"))
+                                    .font(.callout)
+                                    .fontWeight(.medium)
+                                    .textScale(.secondary)
+                                    .foregroundStyle(.gray)
+                            }
+                            Text(day.date.format("dd"))
+                                .font(.title2)
+                                .fontWeight(.bold)
+                                .textScale(.secondary)
+                                .foregroundStyle(isSameDay(day.date, self.currentDate) ? .white : .gray)
+                                .frame(width: 30,height: 30)
+                                .background(content:{
+                                    if isSameDay(day.date, currentDate){
+                                        Circle()
+                                            .fill(.blue)
+                                            .matchedGeometryEffect(id:"TABINDICATOR", in: animation)
+                                    }
+
+                                    if day.data != nil {
+                                        Circle()
+                                            .fill(.red)
+                                            .frame(width: 5,height: 5)
+                                            .vSpacing(.bottom)
+                                            .offset(y:8)
+                                    }
+                                }
+                                )
+                                .background(.white.shadow(.drop(radius: 1)), in: .circle)
+                        }
+                        .hSpacing(.center)
+                        .contentShape(.rect)
+                        .onTapGesture {
+                            withAnimation(.snappy) {
+                                currentDate = day.date
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        .background{
+            GeometryReader {
+                let minX = $0.frame(in: .global).minX
+                Color.clear
+                    .preference(key: OffsetKey.self, value: minX)
+                    .onPreferenceChange(OffsetKey.self) { value in
+                        //when the offset reaches 8 and the createWeek is true
+                        if value.rounded() == 8 && createWeek {
+                            CelendarPageChange()
+                            createWeek = false
+                        }
+                    }
+            }
         }
     }
 
@@ -208,6 +290,13 @@ struct CalendarView: View {
             weekDays.append(currentDate.fetchPreviousWeek())
             weekDays.append(currentWeek)
             weekDays.append(currentDate.fetchNextWeek())
+        }
+
+        if self.monthDays.isEmpty {
+            let currentMonth = Date.fetchMonth()
+            monthDays.append(currentDate.fetchPreviousMohtn())
+            monthDays.append(currentMonth)
+            monthDays.append(currentDate.fetchNextMonth())
         }
 
 

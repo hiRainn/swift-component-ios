@@ -53,30 +53,38 @@ extension Date {
         return Date.fetchWeek(nextWeekDay)
     }
 
-    static func fetchMonth(_ date: Date = .init()) -> [[[CalendarDay]]] {
-        var month: [[[CalendarDay]]] = []
+    static func fetchMonth(_ date: Date = .init()) -> [[CalendarDay]] {
+        var month: [[CalendarDay]] = []
         var week: [CalendarDay] = []
-        let calendar = Calendar.current
+        var calendar = Calendar.current
+        calendar.firstWeekday = 1
         let startDate = calendar.startOfDay(for: date)
         let monthForDate = calendar.dateInterval(of: .month, for: startDate)
 
         guard let startOfMonth = monthForDate?.start else {
             return []
         }
-        for x in 0 ..< 6 {
+
+        // 找到这个月的第一天所在的周的周日
+        let weekdayOfFirstDay = calendar.component(.weekday, from: startOfMonth)
+        let firstSunday = calendar.date(byAdding: .day, value: 1-weekdayOfFirstDay, to: startOfMonth)!
+
+        for x in 0..<6 {
             for y in 0..<7 {
-                var addValue: Int = x * 7 + y
-                if let weekDay = calendar.date(byAdding: .day,value: addValue ,to: startOfMonth) {
+                let addValue: Int = x * 7 + y
+                if let weekDay = calendar.date(byAdding: .day,value: addValue ,to: firstSunday) {
                     week.append(.init(date: weekDay))
                 }
             }
-            month.append([week])
+            month.append(week)
+            week.removeAll()
         }
-
+        print(week.count)
+        print(month.count)
         return month
     }
 
-    func fetchPreviousMohtn() -> [[[CalendarDay]]] {
+    func fetchPreviousMohtn() -> [[CalendarDay]] {
         let calendar = Calendar.current
         guard let priviousWeekDay = calendar.date(byAdding: .month, value: -1, to: self) else {
             return []
@@ -85,7 +93,7 @@ extension Date {
         return Date.fetchMonth()
     }
 
-    func fetchNextMohtn() -> [[[CalendarDay]]] {
+    func fetchNextMonth() -> [[CalendarDay]] {
         let calendar = Calendar.current
         guard let priviousWeekDay = calendar.date(byAdding: .month, value: 1, to: self) else {
             return []
