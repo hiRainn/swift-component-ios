@@ -11,9 +11,8 @@ struct CalendarView: View {
     @State private var currentDate: Date = .init()
     @State private var weekDays: [[Date.CalendarDay]] = []
     @State private var monthDays: [[[Date.CalendarDay]]] = []
-    @State private var weekIndex: Int = 1
-    @State private var createWeek: Bool = false
-    @State private var pageNext: Bool = false
+    @State private var pageIndex: Int = 1
+    @State private var createPage: Bool = false
 
     @Namespace private var animation
     var body: some View {
@@ -65,7 +64,7 @@ struct CalendarView: View {
     @ViewBuilder
     func CompactCalendarView() -> some View {
         VStack{
-            TabView(selection: self.$weekIndex){
+            TabView(selection: self.$pageIndex){
                 //fetch previos weekday
                 ForEach(self.weekDays.indices,id: \.self) {index in
                     CompactCalendarTabView(self.weekDays[index])
@@ -76,15 +75,10 @@ struct CalendarView: View {
             .tabViewStyle(.page(indexDisplayMode: .never))
             .frame(height:100)
             .padding(.horizontal,-8)
-            .onChange(of: weekIndex, initial: false, {oldValue,newValue in
+            .onChange(of: pageIndex, initial: false, {oldValue,newValue in
                 //creating when it reaches first/last page
                 if newValue == 0 || newValue == (weekDays.count - 1) {
-                    if (newValue - oldValue) > 0 {
-                        pageNext = true
-                    } else {
-                        pageNext = false
-                    }
-                    createWeek = true
+                    createPage = true
                 }
             })
         }
@@ -101,7 +95,7 @@ struct CalendarView: View {
                         .fontWeight(.medium)
                         .textScale(.secondary)
                         .foregroundStyle(.gray)
-                    Text(day.date.format("dd"))
+                    Text(day.date.format("d"))
                         .font(.title2)
                         .fontWeight(.bold)
                         .textScale(.secondary)
@@ -123,7 +117,7 @@ struct CalendarView: View {
                             }
                         }
                         )
-                        .background(.white.shadow(.drop(radius: 1)), in: .circle)
+//                        .background(.white.shadow(.drop(radius: 1)), in: .circle)
                 }
                 .hSpacing(.center)
                 .contentShape(.rect)
@@ -131,6 +125,11 @@ struct CalendarView: View {
                     withAnimation(.snappy) {
                         currentDate = day.date
                     }
+                    //rebuild month data
+                    monthDays.removeAll()
+                    monthDays.append(currentDate.fetchPreviousMonth())
+                    monthDays.append(Date.fetchMonth(currentDate))
+                    monthDays.append(currentDate.fetchNextMonth())
                 }
             }
         }
@@ -141,9 +140,9 @@ struct CalendarView: View {
                     .preference(key: OffsetKey.self, value: minX)
                     .onPreferenceChange(OffsetKey.self) { value in
                         //when the offset reaches 8 and the createWeek is true
-                        if value.rounded() == 8 && createWeek {
+                        if value.rounded() == 8 && createPage {
                             CelendarPageChange()
-                            createWeek = false
+                            createPage = false
                         }
                     }
             }
@@ -154,7 +153,7 @@ struct CalendarView: View {
     @ViewBuilder
     func FullCalendarView() -> some View{
         VStack{
-            TabView(selection: self.$weekIndex){
+            TabView(selection: self.$pageIndex){
                 //fetch previos weekday
                 ForEach(self.monthDays.indices,id: \.self) {index in
                     FullCalendarTabView(self.monthDays[index])
@@ -165,15 +164,10 @@ struct CalendarView: View {
             .tabViewStyle(.page(indexDisplayMode: .never))
             .frame(height:288)
             .padding(.horizontal,-8)
-            .onChange(of: weekIndex, initial: false, {oldValue,newValue in
+            .onChange(of: pageIndex, initial: false, {oldValue,newValue in
                 //creating when it reaches first/last page
                 if newValue == 0 || newValue == (weekDays.count - 1) {
-                    if (newValue - oldValue) > 0 {
-                        pageNext = true
-                    } else {
-                        pageNext = false
-                    }
-                    createWeek = true
+                    createPage = true
                 }
             })
         }
@@ -194,7 +188,7 @@ struct CalendarView: View {
                                     .textScale(.secondary)
                                     .foregroundStyle(.gray)
                             }
-                            Text(day.date.format("dd"))
+                            Text(day.date.format("d"))
                                 .font(.title2)
                                 .fontWeight(.bold)
                                 .textScale(.secondary)
@@ -214,9 +208,9 @@ struct CalendarView: View {
                                             .vSpacing(.bottom)
                                             .offset(y:8)
                                     }
-                                }
-                                )
-                                .background(.white.shadow(.drop(radius: 1)), in: .circle)
+                                })
+//                                .padding(.bottom,8)
+//                                .background(.white.shadow(.drop(radius: 1)), in: .circle)
                         }
                         .hSpacing(.center)
                         .contentShape(.rect)
@@ -224,6 +218,11 @@ struct CalendarView: View {
                             withAnimation(.snappy) {
                                 currentDate = day.date
                             }
+                            //rebuild week data
+                            weekDays.removeAll()
+                            weekDays.append(currentDate.fetchPreviousWeek())
+                            weekDays.append(Date.fetchWeek(currentDate))
+                            weekDays.append(currentDate.fetchNextWeek())
                         }
                     }
                 }
@@ -236,9 +235,9 @@ struct CalendarView: View {
                     .preference(key: OffsetKey.self, value: minX)
                     .onPreferenceChange(OffsetKey.self) { value in
                         //when the offset reaches 8 and the createWeek is true
-                        if value.rounded() == 8 && createWeek {
+                        if value.rounded() == 8 && createPage {
                             CelendarPageChange()
-                            createWeek = false
+                            createPage = false
                         }
                     }
             }
@@ -246,34 +245,51 @@ struct CalendarView: View {
     }
 
     func CelendarPageChange() {
-        //week page change
-        if weekDays.indices.contains(weekIndex) {
-            if let firstDate =  weekDays[weekIndex].first?.date, weekIndex == 0 {
-                weekDays.insert(firstDate.fetchPreviousWeek(), at: 0)
-                weekDays.removeLast()
-                weekIndex = 1
-            }
-
-            if let lastDate =  weekDays[weekIndex].last?.date, weekIndex == (weekDays.count - 1) {
-                weekDays.append(lastDate.fetchNextWeek())
-                weekDays.removeFirst()
-                weekIndex = weekDays.count - 2
-
-            }
-        }
-        //month page change
-
-        //change current day
+        let calendar = Calendar.current
         if showFullCalendar {
+            //month page change
+            if monthDays.indices.contains(pageIndex) {
+                if pageIndex == 0 {
+                    currentDate = calendar.date(byAdding: .month, value: -1, to: currentDate)!
+                    monthDays.insert(currentDate.fetchPreviousMonth(), at: 0)
+                    monthDays.removeLast() 
+                    pageIndex = 1
+                }
 
-        } else {
-            if pageNext {
-                currentDate = currentDate.getSomeDayAfter(7)!
-            } else {
-                currentDate = currentDate.getSomeDayAfter(-7)!
+                if pageIndex == 2 {
+                    currentDate = calendar.date(byAdding: .month, value: 1, to: currentDate)!
+                    monthDays.append(currentDate.fetchNextMonth())
+                    monthDays.removeFirst()
+                    pageIndex = 1
+                }
             }
+            weekDays.removeAll()
+            weekDays.append(currentDate.fetchPreviousWeek())
+            weekDays.append(Date.fetchWeek(currentDate))
+            weekDays.append(currentDate.fetchNextWeek())
+        } else {
+            //week page change
+            if weekDays.indices.contains(pageIndex) {
+                if pageIndex == 0 {
+                    currentDate = currentDate.getSomeDayAfter(-7)!
+                    weekDays.insert(currentDate.fetchPreviousWeek(), at: 0)
+                    weekDays.removeLast()
+                    pageIndex = 1
+                }
+
+                if pageIndex == 2 {
+                    currentDate = currentDate.getSomeDayAfter(7)!
+                    weekDays.append(currentDate.fetchNextWeek())
+                    weekDays.removeFirst()
+                    pageIndex = 1
+
+                }
+            }
+            monthDays.removeAll()
+            monthDays.append(currentDate.fetchPreviousMonth())
+            monthDays.append(Date.fetchMonth(currentDate))
+            monthDays.append(currentDate.fetchNextMonth())
         }
-//        print(currentDate)
     }
 
     @ViewBuilder
@@ -294,7 +310,7 @@ struct CalendarView: View {
 
         if self.monthDays.isEmpty {
             let currentMonth = Date.fetchMonth()
-            monthDays.append(currentDate.fetchPreviousMohtn())
+            monthDays.append(currentDate.fetchPreviousMonth())
             monthDays.append(currentMonth)
             monthDays.append(currentDate.fetchNextMonth())
         }

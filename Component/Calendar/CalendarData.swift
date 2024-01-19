@@ -79,27 +79,25 @@ extension Date {
             month.append(week)
             week.removeAll()
         }
-        print(week.count)
-        print(month.count)
         return month
     }
 
-    func fetchPreviousMohtn() -> [[CalendarDay]] {
+    func fetchPreviousMonth() -> [[CalendarDay]] {
         let calendar = Calendar.current
-        guard let priviousWeekDay = calendar.date(byAdding: .month, value: -1, to: self) else {
+        guard let priviousMonthkDay = calendar.date(byAdding: .month, value: -1, to: self) else {
             return []
         }
 
-        return Date.fetchMonth()
+        return Date.fetchMonth(priviousMonthkDay)
     }
 
     func fetchNextMonth() -> [[CalendarDay]] {
         let calendar = Calendar.current
-        guard let priviousWeekDay = calendar.date(byAdding: .month, value: 1, to: self) else {
+        guard let nextMonthDay = calendar.date(byAdding: .month, value: 1, to: self) else {
             return []
         }
 
-        return Date.fetchMonth()
+        return Date.fetchMonth(nextMonthDay)
     }
 
     struct CalendarDay: Identifiable {
