@@ -156,7 +156,7 @@ struct CalendarView: View {
             TabView(selection: self.$pageIndex){
                 //fetch previos weekday
                 ForEach(self.monthDays.indices,id: \.self) {index in
-                    FullCalendarTabView(self.monthDays[index])
+                    FullCalendarTabView(self.monthDays[index], index)
                         .padding(.horizontal,8)
                         .tag(index)
                 }
@@ -175,7 +175,7 @@ struct CalendarView: View {
     }
 
     @ViewBuilder
-    func FullCalendarTabView(_ monthDay: [[Date.CalendarDay]]) ->some View {
+    func FullCalendarTabView(_ monthDay: [[Date.CalendarDay]],_ selectIndex: Int) ->some View {
         VStack{
             ForEach(0..<monthDay.count, id: \.self) { index in
                 HStack(spacing:0){
@@ -192,10 +192,11 @@ struct CalendarView: View {
                                 .font(.title2)
                                 .fontWeight(.bold)
                                 .textScale(.secondary)
-                                .foregroundStyle(isSameDay(day.date, self.currentDate) ? .white : .gray)
+                                .foregroundStyle(getCalendarTextColor(day.date,selectIndex))
                                 .frame(width: 30,height: 30)
                                 .background(content:{
-                                    if isSameDay(day.date, currentDate){
+                                    if isSameDay(day.date, currentDate) && selectIndex == 1{
+                                        let _ = print("==")
                                         Circle()
                                             .fill(.blue)
                                             .matchedGeometryEffect(id:"TABINDICATOR", in: animation)
@@ -209,7 +210,6 @@ struct CalendarView: View {
                                             .offset(y:8)
                                     }
                                 })
-//                                .padding(.bottom,8)
 //                                .background(.white.shadow(.drop(radius: 1)), in: .circle)
                         }
                         .hSpacing(.center)
@@ -242,6 +242,23 @@ struct CalendarView: View {
                     }
             }
         }
+    }
+
+    func getCalendarTextColor(_ day: Date,_ index: Int) -> Color {
+        var color: Color = .gray
+        if isSameDay(day, self.currentDate) {
+            if index == 1 {
+                color = .white
+            } else {
+                color = .gray
+            }
+        } else {
+            let compareRes = isSameMonth(day,self.currentDate)
+            if compareRes != 0 {
+                color = Color(red: 224/255, green: 224/255, blue: 224/255)
+            }
+        }
+        return color
     }
 
     func CelendarPageChange() {
@@ -320,6 +337,21 @@ struct CalendarView: View {
 
     func isSameDay(_ day1: Date, _ day2: Date) -> Bool {
         return Calendar.current.isDate(day1, inSameDayAs: day2)
+    }
+
+    func isSameMonth(_ day1: Date,_ day2: Date) -> Int {
+        var result: Int = 0
+        let calendar = Calendar.current
+        if calendar.component(.month, from: day1) == calendar.component(.month, from: day2) &&
+            calendar.component(.year, from: day1) == calendar.component(.year, from: day2) {
+            return result
+        }
+        if day1 < day2 {
+            result = -1
+        } else {
+            result = 1
+        }
+        return result
     }
 
     func currentDayHaveData() -> Bool {
