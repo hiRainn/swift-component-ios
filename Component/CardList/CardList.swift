@@ -6,3 +6,15 @@
 //
 
 import SwiftUI
+
+struct CardList: View {
+    var body: some View {
+        VStack{
+
+        }
+    }
+}
+
+#Preview {
+    CardList()
+}

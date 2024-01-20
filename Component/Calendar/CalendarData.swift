@@ -9,10 +9,13 @@ import SwiftUI
 
 struct SomeData: Identifiable {
     var id: UUID = .init()
+    var createAt: Date
 }
 
 //if you need to put some datas into your celendar
-var DataList: [SomeData] = []
+var DataList: [SomeData] = [
+    
+]
 
 //extension functions of Date
 extension Date {

@@ -15,6 +15,8 @@ struct CalendarView: View {
     @State private var createPage: Bool = false
 
     @Namespace private var animation
+    @Namespace private var fullAnimation
+//    @Namespace private var fullAnimation
     var body: some View {
         VStack(alignment: .center, spacing: 0,content: {
             //header
@@ -198,7 +200,7 @@ struct CalendarView: View {
                                     if isSameDay(day.date, currentDate) && selectIndex == 1{
                                         Circle()
                                             .fill(.blue)
-                                            .matchedGeometryEffect(id:"TABINDICATOR", in: animation)
+                                            .matchedGeometryEffect(id:"FULLTABINDICATOR", in: fullAnimation)
                                     }
 
                                     if day.data != nil {
@@ -215,7 +217,7 @@ struct CalendarView: View {
                         .onTapGesture {
                             //if tap date is not this month,page to that month
                             let currentMonth: Int = isSameMonth(day.date, currentDate)
-                            let _ = print(currentMonth)
+                            //currentMonth eq 0 means the same month
                             if currentMonth == 0 {
                                 withAnimation(.snappy) {
                                     currentDate = day.date
@@ -226,9 +228,9 @@ struct CalendarView: View {
                                 weekDays.append(Date.fetchWeek(currentDate))
                                 weekDays.append(currentDate.fetchNextWeek())
                             } else {
-                                self.pageIndex = currentMonth + 1
+                                currentDate = day.date
                                 withAnimation(.snappy) {
-                                    currentDate = day.date
+                                    self.pageIndex = currentMonth + 1
                                 }
                                 CelendarPageChange(false)
                             }
@@ -280,33 +282,27 @@ struct CalendarView: View {
             //month page change
             if monthDays.indices.contains(pageIndex) {
                 if pageIndex == 0 {
-                    print("----")
                     let newDate: Date = calendar.date(byAdding: .month, value: -1, to: currentDate)!
                     if changeCurrentDay {
                         monthDays.insert(newDate.fetchPreviousMonth(), at: 0)
+                        currentDate = newDate
                     } else {
                         monthDays.insert(currentDate.fetchPreviousMonth(), at: 0)
                     }
                     monthDays.removeLast()
                     pageIndex = 1
-                    if changeCurrentDay {
-                        currentDate = newDate
-                    }
                 }
 
                 if pageIndex == 2 {
-                    print("++++")
                     let newDate: Date = calendar.date(byAdding: .month, value: 1, to: currentDate)!
                     if changeCurrentDay {
                         monthDays.append(newDate.fetchNextMonth())
+                        currentDate = newDate
                     } else {
                         monthDays.append(currentDate.fetchNextMonth())
                     }
                     monthDays.removeFirst()
                     pageIndex = 1
-                    if changeCurrentDay {
-                        currentDate = newDate
-                    }
                 }
             }
             weekDays.removeAll()

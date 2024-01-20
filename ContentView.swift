@@ -42,6 +42,5 @@ struct TestView: View {
 }
 
 #Preview {
-    TestView()
-        .tabViewStyle(PageTabViewStyle())
+    CalendarView()
 }
