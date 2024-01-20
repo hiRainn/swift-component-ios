@@ -141,7 +141,7 @@ struct CalendarView: View {
                     .onPreferenceChange(OffsetKey.self) { value in
                         //when the offset reaches 8 and the createWeek is true
                         if value.rounded() == 8 && createPage {
-                            CelendarPageChange()
+                            CelendarPageChange(true)
                             createPage = false
                         }
                     }
@@ -196,7 +196,6 @@ struct CalendarView: View {
                                 .frame(width: 30,height: 30)
                                 .background(content:{
                                     if isSameDay(day.date, currentDate) && selectIndex == 1{
-                                        let _ = print("==")
                                         Circle()
                                             .fill(.blue)
                                             .matchedGeometryEffect(id:"TABINDICATOR", in: animation)
@@ -210,19 +209,29 @@ struct CalendarView: View {
                                             .offset(y:8)
                                     }
                                 })
-//                                .background(.white.shadow(.drop(radius: 1)), in: .circle)
                         }
                         .hSpacing(.center)
                         .contentShape(.rect)
                         .onTapGesture {
-                            withAnimation(.snappy) {
-                                currentDate = day.date
+                            //if tap date is not this month,page to that month
+                            let currentMonth: Int = isSameMonth(day.date, currentDate)
+                            let _ = print(currentMonth)
+                            if currentMonth == 0 {
+                                withAnimation(.snappy) {
+                                    currentDate = day.date
+                                }
+                                //rebuild week data
+                                weekDays.removeAll()
+                                weekDays.append(currentDate.fetchPreviousWeek())
+                                weekDays.append(Date.fetchWeek(currentDate))
+                                weekDays.append(currentDate.fetchNextWeek())
+                            } else {
+                                self.pageIndex = currentMonth + 1
+                                withAnimation(.snappy) {
+                                    currentDate = day.date
+                                }
+                                CelendarPageChange(false)
                             }
-                            //rebuild week data
-                            weekDays.removeAll()
-                            weekDays.append(currentDate.fetchPreviousWeek())
-                            weekDays.append(Date.fetchWeek(currentDate))
-                            weekDays.append(currentDate.fetchNextWeek())
                         }
                     }
                 }
@@ -236,7 +245,7 @@ struct CalendarView: View {
                     .onPreferenceChange(OffsetKey.self) { value in
                         //when the offset reaches 8 and the createWeek is true
                         if value.rounded() == 8 && createPage {
-                            CelendarPageChange()
+                            CelendarPageChange(true)
                             createPage = false
                         }
                     }
@@ -245,15 +254,19 @@ struct CalendarView: View {
     }
 
     func getCalendarTextColor(_ day: Date,_ index: Int) -> Color {
+        let calendar = Calendar.current
+        let monthAter: Int = index - 1
+        let compareDay: Date = calendar.date(byAdding: .month, value: monthAter, to: currentDate)!
+
         var color: Color = .gray
-        if isSameDay(day, self.currentDate) {
+        if isSameDay(day, compareDay) {
             if index == 1 {
                 color = .white
             } else {
                 color = .gray
             }
         } else {
-            let compareRes = isSameMonth(day,self.currentDate)
+            let compareRes = isSameMonth(day,compareDay)
             if compareRes != 0 {
                 color = Color(red: 224/255, green: 224/255, blue: 224/255)
             }
@@ -261,23 +274,39 @@ struct CalendarView: View {
         return color
     }
 
-    func CelendarPageChange() {
+    func CelendarPageChange(_ changeCurrentDay: Bool) {
         let calendar = Calendar.current
         if showFullCalendar {
             //month page change
             if monthDays.indices.contains(pageIndex) {
                 if pageIndex == 0 {
-                    currentDate = calendar.date(byAdding: .month, value: -1, to: currentDate)!
-                    monthDays.insert(currentDate.fetchPreviousMonth(), at: 0)
-                    monthDays.removeLast() 
+                    print("----")
+                    let newDate: Date = calendar.date(byAdding: .month, value: -1, to: currentDate)!
+                    if changeCurrentDay {
+                        monthDays.insert(newDate.fetchPreviousMonth(), at: 0)
+                    } else {
+                        monthDays.insert(currentDate.fetchPreviousMonth(), at: 0)
+                    }
+                    monthDays.removeLast()
                     pageIndex = 1
+                    if changeCurrentDay {
+                        currentDate = newDate
+                    }
                 }
 
                 if pageIndex == 2 {
-                    currentDate = calendar.date(byAdding: .month, value: 1, to: currentDate)!
-                    monthDays.append(currentDate.fetchNextMonth())
+                    print("++++")
+                    let newDate: Date = calendar.date(byAdding: .month, value: 1, to: currentDate)!
+                    if changeCurrentDay {
+                        monthDays.append(newDate.fetchNextMonth())
+                    } else {
+                        monthDays.append(currentDate.fetchNextMonth())
+                    }
                     monthDays.removeFirst()
                     pageIndex = 1
+                    if changeCurrentDay {
+                        currentDate = newDate
+                    }
                 }
             }
             weekDays.removeAll()
