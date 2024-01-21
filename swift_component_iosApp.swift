@@ -12,6 +12,9 @@ struct swift_component_iosApp: App {
     var body: some Scene {
         WindowGroup {
             CalendarView()
+                .onAppear(){
+                    initDataList()
+                }
         }
     }
 }

@@ -17,7 +17,6 @@ struct CalendarView: View {
 
     @Namespace private var animation
     @Namespace private var fullAnimation
-//    @Namespace private var fullAnimation
     var body: some View {
         VStack(alignment: .center, spacing: 0,content: {
             //header
@@ -338,16 +337,12 @@ struct CalendarView: View {
     @ViewBuilder
     func dataView() -> some View {
         VStack{
-//            if self.data != nil {
-//                ForEach(self.data!) { value in
-//                    Text(value.title)
-//                    Text(value.content)
-////                    Text(value.createAt)
-//                }
-//            }
-
+            ForEach(self.showData ) { value in
+                Text(value.title)
+                Text(value.content)
+                Text(value.createAt.format("yyyy-MM-dd HH:mm:ss"))
+            }
         }
-
     }
 
     func onAppearEvent() {
@@ -389,10 +384,10 @@ struct CalendarView: View {
             for v in self.weekDays[i] {
                 if self.currentDate.isSameDay(v.date) && v.data != nil {
                     if let data = v.data as? [SomeData], !data.isEmpty {
-                        self.showData = data
-                        print(data,type(of: data),type(of: self.showData),self.showData)
+                        DispatchQueue.main.async {
+                            self.showData = data
+                        }
                     } else {
-                        print("v.data is nil or empty")
                         self.showData = []
                     }
                     has.toggle()

@@ -110,16 +110,15 @@ extension Date {
         guard let startOfMonth = monthForDate?.start else {
             return []
         }
-        guard let endOfMonth = monthForDate?.end else {
-            return []
-        }
-        //mock get date
-        var data: [SomeData] = []
-        data = getDataByDate(startOfMonth, endOfMonth)
 
         //find first sunday of this month
         let weekdayOfFirstDay = calendar.component(.weekday, from: startOfMonth)
         let firstSunday = calendar.date(byAdding: .day, value: 1-weekdayOfFirstDay, to: startOfMonth)!
+
+        //mock get date
+        var data: [SomeData] = []
+        //One page has a total of 42 days
+        data = getDataByDate(firstSunday, firstSunday.getSomeDayAfter(41)!)
 
         for x in 0..<6 {
             for y in 0..<7 {
