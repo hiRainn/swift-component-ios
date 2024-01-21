@@ -79,7 +79,7 @@ struct CalendarView: View {
             .padding(.horizontal,-8)
             .onChange(of: pageIndex, initial: false, {oldValue,newValue in
                 //creating when it reaches first/last page
-                if newValue == 0 || newValue == (weekDays.count - 1) {
+                if newValue == 0 || newValue == 2 {
                     createPage = true
                 }
             })
@@ -168,7 +168,7 @@ struct CalendarView: View {
             .padding(.horizontal,-8)
             .onChange(of: pageIndex, initial: false, {oldValue,newValue in
                 //creating when it reaches first/last page
-                if newValue == 0 || newValue == (weekDays.count - 1) {
+                if newValue == 0 || newValue == 2 {
                     createPage = true
                 }
             })
@@ -231,8 +231,8 @@ struct CalendarView: View {
                                 currentDate = day.date
                                 withAnimation(.snappy) {
                                     self.pageIndex = currentMonth + 1
+                                    CelendarPageChange(false)
                                 }
-                                CelendarPageChange(false)
                             }
                         }
                     }
@@ -292,7 +292,6 @@ struct CalendarView: View {
                     monthDays.removeLast()
                     pageIndex = 1
                 }
-
                 if pageIndex == 2 {
                     let newDate: Date = calendar.date(byAdding: .month, value: 1, to: currentDate)!
                     if changeCurrentDay {
@@ -324,7 +323,6 @@ struct CalendarView: View {
                     weekDays.append(currentDate.fetchNextWeek())
                     weekDays.removeFirst()
                     pageIndex = 1
-
                 }
             }
             monthDays.removeAll()
