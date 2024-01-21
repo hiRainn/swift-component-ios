@@ -9,6 +9,7 @@ import SwiftUI
 struct CalendarView: View {
     @State private var showFullCalendar = false
     @State private var currentDate: Date = .init()
+    @State private var showData: [SomeData] = []
     @State private var weekDays: [[Date.CalendarDay]] = []
     @State private var monthDays: [[[Date.CalendarDay]]] = []
     @State private var pageIndex: Int = 1
@@ -101,10 +102,10 @@ struct CalendarView: View {
                         .font(.title2)
                         .fontWeight(.bold)
                         .textScale(.secondary)
-                        .foregroundStyle(isSameDay(day.date, self.currentDate) ? .white : .gray)
+                        .foregroundStyle(day.date.isSameDay(self.currentDate) ? .white : .gray)
                         .frame(width: 30,height: 30)
                         .background(content:{
-                            if isSameDay(day.date, currentDate){
+                            if day.date.isSameDay(currentDate){
                                 Circle()
                                     .fill(.blue)
                                     .matchedGeometryEffect(id:"TABINDICATOR", in: animation)
@@ -197,7 +198,7 @@ struct CalendarView: View {
                                 .foregroundStyle(getCalendarTextColor(day.date,selectIndex))
                                 .frame(width: 30,height: 30)
                                 .background(content:{
-                                    if isSameDay(day.date, currentDate) && selectIndex == 1{
+                                    if day.date.isSameDay(currentDate) && selectIndex == 1{
                                         Circle()
                                             .fill(.blue)
                                             .matchedGeometryEffect(id:"FULLTABINDICATOR", in: fullAnimation)
@@ -261,7 +262,7 @@ struct CalendarView: View {
         let compareDay: Date = calendar.date(byAdding: .month, value: monthAter, to: currentDate)!
 
         var color: Color = .gray
-        if isSameDay(day, compareDay) {
+        if day.isSameDay(compareDay) {
             if index == 1 {
                 color = .white
             } else {
@@ -336,8 +337,15 @@ struct CalendarView: View {
 
     @ViewBuilder
     func dataView() -> some View {
-        VStack {
-            Text("show your data")
+        VStack{
+//            if self.data != nil {
+//                ForEach(self.data!) { value in
+//                    Text(value.title)
+//                    Text(value.content)
+////                    Text(value.createAt)
+//                }
+//            }
+
         }
 
     }
@@ -360,10 +368,6 @@ struct CalendarView: View {
 
     }
 
-    func isSameDay(_ day1: Date, _ day2: Date) -> Bool {
-        return Calendar.current.isDate(day1, inSameDayAs: day2)
-    }
-
     func isSameMonth(_ day1: Date,_ day2: Date) -> Int {
         var result: Int = 0
         let calendar = Calendar.current
@@ -383,7 +387,14 @@ struct CalendarView: View {
         var has: Bool = false
         for i in 0..<self.weekDays.count {
             for v in self.weekDays[i] {
-                if isSameDay(self.currentDate, v.date) && v.data != nil {
+                if self.currentDate.isSameDay(v.date) && v.data != nil {
+                    if let data = v.data as? [SomeData], !data.isEmpty {
+                        self.showData = data
+                        print(data,type(of: data),type(of: self.showData),self.showData)
+                    } else {
+                        print("v.data is nil or empty")
+                        self.showData = []
+                    }
                     has.toggle()
                 }
             }
@@ -394,6 +405,9 @@ struct CalendarView: View {
 
 #Preview {
     CalendarView()
+        .onAppear(){
+            initDataList()
+        }
 }
 
 

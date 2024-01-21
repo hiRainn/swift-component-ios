@@ -9,13 +9,39 @@ import SwiftUI
 
 struct SomeData: Identifiable {
     var id: UUID = .init()
+    var title: String
+    var content: String
     var createAt: Date
 }
 
 //if you need to put some datas into your celendar
-var DataList: [SomeData] = [
-    
-]
+var today: Date = .init()
+
+var DataList: [SomeData] = []
+
+//mock database data
+func initDataList() {
+    for i in 0...30 {
+        let data1: SomeData = SomeData(title: "title" + String(i), content: "concent" + today.getSomeDayAfter(i * 3)!.format("yyyyMMdd"), createAt: today.getSomeDayAfter(i * 3)!)
+        let data2: SomeData = SomeData(title: "title" + String(i), content: "concent" + today.getSomeDayAfter(-i * 3)!.format("yyyyMMdd"), createAt: today.getSomeDayAfter(-i * 3)!)
+        DataList.append(data1)
+        DataList.append(data2)
+    }
+
+}
+
+//mock query data
+func getDataByDate(_ startDay: Date,_ endDay: Date) -> [SomeData] {
+    var data: [SomeData] = []
+    DataList.forEach { d in
+        if d.createAt >= startDay && d.createAt <= endDay {
+            data.append(d)
+        }
+    }
+
+    return data
+}
+
 
 //extension functions of Date
 extension Date {
@@ -26,13 +52,30 @@ extension Date {
         let calendar = Calendar.current
         let startDate = calendar.startOfDay(for: date)
         let weekForDate = calendar.dateInterval(of: .weekOfMonth, for: startDate)
-
         guard let startOfWeek = weekForDate?.start else {
             return []
         }
+        guard let endOfWeek = weekForDate?.end else {
+            return []
+        }
+        //mock get date
+        var data: [SomeData] = []
+        data = getDataByDate(startOfWeek, endOfWeek)
+
         for index in 0..<7 {
             if let weekDay = calendar.date(byAdding: .day,value: index ,to: startOfWeek) {
-                week.append(.init(date: weekDay))
+                var w: CalendarDay =  CalendarDay(date:weekDay)
+                var d: [SomeData] = []
+                //get data
+                data.forEach{ value in
+                    if weekDay.isSameDay(value.createAt) {
+                        d.append(value)
+                    }
+                }
+                if d.count != 0 {
+                    w.data = d
+                }
+                week.append(w)
             }
         }
         return week
@@ -67,8 +110,14 @@ extension Date {
         guard let startOfMonth = monthForDate?.start else {
             return []
         }
+        guard let endOfMonth = monthForDate?.end else {
+            return []
+        }
+        //mock get date
+        var data: [SomeData] = []
+        data = getDataByDate(startOfMonth, endOfMonth)
 
-        // 找到这个月的第一天所在的周的周日
+        //find first sunday of this month
         let weekdayOfFirstDay = calendar.component(.weekday, from: startOfMonth)
         let firstSunday = calendar.date(byAdding: .day, value: 1-weekdayOfFirstDay, to: startOfMonth)!
 
@@ -76,7 +125,18 @@ extension Date {
             for y in 0..<7 {
                 let addValue: Int = x * 7 + y
                 if let weekDay = calendar.date(byAdding: .day,value: addValue ,to: firstSunday) {
-                    week.append(.init(date: weekDay))
+                    var w: CalendarDay =  CalendarDay(date:weekDay)
+                    var d: [SomeData] = []
+                    //get data
+                    data.forEach{ value in
+                        if weekDay.isSameDay(value.createAt) {
+                            d.append(value)
+                        }
+                    }
+                    if d.count != 0 {
+                        w.data = d
+                    }
+                    week.append(w)
                 }
             }
             month.append(week)
