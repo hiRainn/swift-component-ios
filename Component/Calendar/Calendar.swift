@@ -14,6 +14,7 @@ struct CalendarView: View {
     @State private var monthDays: [[[Date.CalendarDay]]] = []
     @State private var pageIndex: Int = 1
     @State private var createPage: Bool = false
+    @State private var scollTop: Bool = false
 
     @Namespace private var animation
     @Namespace private var fullAnimation
@@ -33,14 +34,20 @@ struct CalendarView: View {
             }
             .background(.white)
             if self.showData.count != 0 {
-                ScrollView{
-                    dataView().hSpacing(.center)
+                ScrollViewReader { scrollViewProxy in
+                    ScrollView{
+                        dataView().hSpacing(.center)
+                    }
+//                    .frame(maxHeight: 400)
+                    .background(.yellow,in: .rect(cornerRadius: 20))
+                    .padding(12)
+                    .onChange(of: currentDate ,{
+                        withAnimation{
+                            print("scoll to top")
+                            scrollViewProxy.scrollTo(0)
+                        }
+                    })
                 }
-//                .frame(height: 200)
-                .background(.white)
-                .padding(12)
-                .clipShape(RoundedRectangle(cornerRadius: 10))
-
             } else {
                 Text("no data")
             }
@@ -347,10 +354,10 @@ struct CalendarView: View {
     @ViewBuilder
     func dataView() -> some View {
         VStack(alignment:.leading){
-            ForEach(self.showData ) { value in
-                Text(value.title).padding(.top,10)
-                Text(value.content)
-                Text(value.createAt.format("yyyy-MM-dd HH:mm:ss"))
+            ForEach(self.showData.indices, id:\.self) { index in
+                Text(self.showData[index].title).padding(.top,10).id(index)
+                Text(self.showData[index].content)
+                Text(self.showData[index].createAt.format("yyyy-MM-dd HH:mm:ss"))
             }
         }
     }
