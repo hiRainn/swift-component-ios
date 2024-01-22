@@ -32,11 +32,15 @@ struct CalendarView: View {
                 onAppearEvent()
             }
             .background(.white)
-            Spacer()
             if self.showData.count != 0 {
                 ScrollView{
-                    dataView()
+                    dataView().hSpacing(.center)
                 }
+//                .frame(height: 200)
+                .background(.white)
+                .padding(12)
+                .clipShape(RoundedRectangle(cornerRadius: 10))
+
             } else {
                 Text("no data")
             }
@@ -251,14 +255,14 @@ struct CalendarView: View {
             GeometryReader {
                 let minX = $0.frame(in: .global).minX
                 Color.clear
-                    .preference(key: OffsetKey.self, value: minX)
-                    .onPreferenceChange(OffsetKey.self) { value in
-                        //when the offset reaches 8 and the createWeek is true
-                        if value.rounded() == 8 && createPage {
-                            CelendarPageChange(true)
-                            createPage = false
-                        }
+                .preference(key: OffsetKey.self, value: minX)
+                .onPreferenceChange(OffsetKey.self) { value in
+                    //when the offset reaches 8 and the createWeek is true
+                    if value.rounded() == 8 && createPage {
+                        CelendarPageChange(true)
+                        createPage = false
                     }
+                }
             }
         }
     }
@@ -342,9 +346,9 @@ struct CalendarView: View {
 
     @ViewBuilder
     func dataView() -> some View {
-        VStack{
+        VStack(alignment:.leading){
             ForEach(self.showData ) { value in
-                Text(value.title)
+                Text(value.title).padding(.top,10)
                 Text(value.content)
                 Text(value.createAt.format("yyyy-MM-dd HH:mm:ss"))
             }
@@ -365,8 +369,6 @@ struct CalendarView: View {
             monthDays.append(currentMonth)
             monthDays.append(currentDate.fetchNextMonth())
         }
-
-
     }
 
     func isSameMonth(_ day1: Date,_ day2: Date) -> Int {

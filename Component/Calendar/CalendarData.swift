@@ -21,23 +21,17 @@ var DataList: [SomeData] = []
 
 //mock database data
 func initDataList() {
+    //mock 3 * 30 days' data
     for i in 0...30 {
-        let data1: SomeData = SomeData(title: "title" + String(i), content: "concent" + today.getSomeDayAfter(i * 3)!.format("yyyyMMdd"), createAt: today.getSomeDayAfter(i * 3)!)
-        let data2: SomeData = SomeData(title: "title" + String(i), content: "concent" + today.getSomeDayAfter(-i * 3)!.format("yyyyMMdd"), createAt: today.getSomeDayAfter(-i * 3)!)
-        DataList.append(data1)
-        DataList.append(data2)
-        DataList.append(data1)
-        DataList.append(data2)
-        DataList.append(data1)
-        DataList.append(data2)
-        DataList.append(data1)
-        DataList.append(data2)
-        DataList.append(data1)
-        DataList.append(data2)
-        DataList.append(data1)
-        DataList.append(data2)
-        DataList.append(data1)
-        DataList.append(data2)
+        //random num data
+        for  randomInt in 0...Int.random(in: 1...20) {
+            let data: SomeData = SomeData(title: "title" + String(randomInt), content: "concent" + today.getSomeDayAfter(i * 3)!.format("yyyy-MM-dd"), createAt: today.getSomeDayAfter(i * 3)!)
+            DataList.append(data)
+        }
+        for  randomInt in 0...Int.random(in: 1...20) {
+            let data: SomeData = SomeData(title: "title" + String(randomInt), content: "concent" + today.getSomeDayAfter(-i * 3)!.format("yyyy-MM-dd"), createAt: today.getSomeDayAfter(-i * 3)!)
+            DataList.append(data)
+        }
     }
 
 }
