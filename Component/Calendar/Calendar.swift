@@ -33,16 +33,16 @@ struct CalendarView: View {
             }
             .background(.white)
             Spacer()
-            if currentDayHaveData() {
-                dataView()
+            if self.showData.count != 0 {
+                ScrollView{
+                    dataView()
+                }
             } else {
                 Text("no data")
             }
             Spacer()
         })
         .background(Color(red: 248/255, green: 248/255, blue: 255/255))
-
-
     }
 
     @ViewBuilder
@@ -126,12 +126,16 @@ struct CalendarView: View {
                 .onTapGesture {
                     withAnimation(.snappy) {
                         currentDate = day.date
+                        setShowData(day)
                     }
                     //rebuild month data
                     monthDays.removeAll()
                     monthDays.append(currentDate.fetchPreviousMonth())
                     monthDays.append(Date.fetchMonth(currentDate))
                     monthDays.append(currentDate.fetchNextMonth())
+                }
+                .onAppear{
+                    setShowData(day)
                 }
             }
         }
@@ -221,6 +225,7 @@ struct CalendarView: View {
                             if currentMonth == 0 {
                                 withAnimation(.snappy) {
                                     currentDate = day.date
+                                    setShowData(day)
                                 }
                                 //rebuild week data
                                 weekDays.removeAll()
@@ -234,6 +239,9 @@ struct CalendarView: View {
                                     CelendarPageChange(false)
                                 }
                             }
+                        }
+                        .onAppear{
+                            setShowData(day)
                         }
                     }
                 }
@@ -376,23 +384,14 @@ struct CalendarView: View {
         return result
     }
 
-    func currentDayHaveData() -> Bool {
-        var has: Bool = false
-        for i in 0..<self.weekDays.count {
-            for v in self.weekDays[i] {
-                if self.currentDate.isSameDay(v.date) && v.data != nil {
-                    if let data = v.data as? [SomeData], !data.isEmpty {
-                        DispatchQueue.main.async {
-                            self.showData = data
-                        }
-                    } else {
-                        self.showData = []
-                    }
-                    has.toggle()
-                }
+    func setShowData(_ data: Date.CalendarDay) {
+        if data.date.isSameDay(currentDate) {
+            if let getData = data.data as? [SomeData], !getData.isEmpty {
+                self.showData = getData
+            } else {
+                self.showData = []
             }
         }
-        return has
     }
 }
 

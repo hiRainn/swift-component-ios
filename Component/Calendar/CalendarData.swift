@@ -26,6 +26,18 @@ func initDataList() {
         let data2: SomeData = SomeData(title: "title" + String(i), content: "concent" + today.getSomeDayAfter(-i * 3)!.format("yyyyMMdd"), createAt: today.getSomeDayAfter(-i * 3)!)
         DataList.append(data1)
         DataList.append(data2)
+        DataList.append(data1)
+        DataList.append(data2)
+        DataList.append(data1)
+        DataList.append(data2)
+        DataList.append(data1)
+        DataList.append(data2)
+        DataList.append(data1)
+        DataList.append(data2)
+        DataList.append(data1)
+        DataList.append(data2)
+        DataList.append(data1)
+        DataList.append(data2)
     }
 
 }
