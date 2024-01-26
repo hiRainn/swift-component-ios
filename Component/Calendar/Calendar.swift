@@ -43,7 +43,6 @@ struct CalendarView: View {
                     .padding(12)
                     .onChange(of: currentDate ,{
                         withAnimation{
-                            print("scoll to top")
                             scrollViewProxy.scrollTo(0)
                         }
                     })
