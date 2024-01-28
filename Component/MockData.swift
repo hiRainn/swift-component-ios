@@ -12,6 +12,9 @@ struct SomeData: Identifiable {
     var title: String
     var content: String
     var createAt: Date
+    var isFinish: Bool = false
+    var finishAt: Date? = nil
+    var tagColor: Color = Color.white
 }
 
 //if you need to put some datas into your celendar

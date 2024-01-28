@@ -19,8 +19,10 @@ struct TimeLineView: View {
         }
     }
 
+    
+
     func onAppearEvent() {
-        
+
     }
 
 }

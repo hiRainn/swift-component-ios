@@ -7,14 +7,9 @@
 
 import SwiftUI
 
-struct timeLineData: Identifiable {
-    var id: UUID = .init()
-    var createAt: Date
-    var title: String
-    var content: String
-    var isFinish: Bool
-    var finishAt: Date? = nil
-    var tagColor: Color
-}
+var TimeLineData: [SomeData] = []
 
+func initTimeLineData() {
+    
+}
 
