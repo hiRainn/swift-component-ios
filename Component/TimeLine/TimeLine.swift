@@ -8,21 +8,31 @@
 import SwiftUI
 
 struct TimeLineView: View {
-    @State private var dataList: [timeLineData] = []
+    @State private var dataList: [SomeData] = []
 
     var body: some View {
         VStack{
-
+            TimeLineView()
         }
         .onAppear{
             onAppearEvent()
+            let _ = print(2)
+
         }
+    }
+
+    @ViewBuilder
+    func TimeLineView() -> some View {
+        ForEach(self.dataList) { item in
+            Text(item.title)
+        }
+        let _ = print(3)  
     }
 
     
 
     func onAppearEvent() {
-
+        self.dataList = initTimeLineData()
     }
 
 }
@@ -31,6 +41,7 @@ struct TimeLineView: View {
     TimeLineView()
         .onAppear(){
             initDataList()
+            let _ = print(1)
         }
 }
 
