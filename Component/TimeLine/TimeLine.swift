@@ -16,7 +16,6 @@ struct TimeLineView: View {
         }
         .onAppear{
             onAppearEvent()
-            let _ = print(2)
 
         }
     }
@@ -26,7 +25,6 @@ struct TimeLineView: View {
         ForEach(self.dataList) { item in
             Text(item.title)
         }
-        let _ = print(3)  
     }
 
     
@@ -41,7 +39,6 @@ struct TimeLineView: View {
     TimeLineView()
         .onAppear(){
             initDataList()
-            let _ = print(1)
         }
 }
 
