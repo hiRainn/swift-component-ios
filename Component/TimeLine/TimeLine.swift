@@ -22,14 +22,31 @@ struct TimeLineView: View {
 
     @ViewBuilder
     func TimeLineView() -> some View {
-        ForEach(self.dataList) { item in
-            Text(item.title)
+        if self.dataList.count != 0 {
+            ScrollViewReader { scrollViewProxy in
+                ScrollView{
+                    ForEach(self.dataList) { item in
+                        Text(item.title)
+                            .padding(.leading,20)
+                            .padding(.top,15)
+                            .hSpacing(.leading)
+                    }
+                }
+                .frame(maxHeight: 600)
+                .background(.yellow,in: .rect(cornerRadius: 20))
+                .padding(12)
+
+
+            }
+        } else {
+            Text("no data")
         }
     }
 
     
 
     func onAppearEvent() {
+        initDataList()
         self.dataList = initTimeLineData()
     }
 
@@ -37,8 +54,5 @@ struct TimeLineView: View {
 
 #Preview {
     TimeLineView()
-        .onAppear(){
-            initDataList()
-        }
 }
 
