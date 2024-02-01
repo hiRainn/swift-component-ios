@@ -25,7 +25,7 @@ struct TimeLineView: View {
         if self.dataList.count != 0 {
             ScrollViewReader { scrollViewProxy in
                 ScrollView{
-                    VStack {
+                    VStack(spacing:20) {
                         ForEach(self.dataList) { item in
                             TimeLineItem(item)
                         }
@@ -34,10 +34,8 @@ struct TimeLineView: View {
                 }
                 .hSpacing(.leading)
                 .frame(maxHeight: 600)
-                .background(.yellow,in: .rect(cornerRadius: 20))
+                .background(Color(red: 248/255, green: 248/255, blue: 255/255),in: .rect(cornerRadius: 20))
                 .padding(12)
-
-
             }
         } else {
             Text("no data")
