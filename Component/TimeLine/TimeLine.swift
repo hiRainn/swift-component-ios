@@ -48,7 +48,13 @@ struct TimeLineView: View {
             Circle()
                 .fill(.blue)
                 .frame(width: 10,height: 10)
+                .padding(4)
                 .background(.white.shadow(.drop(color:.black.opacity(0.1),radius: 3)))
+
+            VStack{
+                Text(item.title)
+                    .fontWeight(.semibold)
+            }
 
         }
         .hSpacing(.leading)
