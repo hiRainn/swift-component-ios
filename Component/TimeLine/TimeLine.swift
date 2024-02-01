@@ -28,6 +28,14 @@ struct TimeLineView: View {
                     VStack(spacing:20) {
                         ForEach(self.dataList) { item in
                             TimeLineItem(item)
+                                .background(alignment: .leading) {
+                                    if dataList.last?.id != item.id {
+                                        Rectangle()
+                                            .frame(width: 1)
+                                            .offset(x:8)
+                                            .padding(.bottom,-20)
+                                    }
+                                }
                         }
                     }.padding([.top,.leading],20)
 
@@ -51,10 +59,21 @@ struct TimeLineView: View {
                 .padding(4)
                 .background(.white.shadow(.drop(color:.black.opacity(0.1),radius: 3)))
 
-            VStack{
+            VStack(alignment: .leading, spacing: 8,content: {
                 Text(item.title)
                     .fontWeight(.semibold)
-            }
+                    .foregroundStyle(item.isFinish ? .gray : .black)
+
+                Label(item.createAt.format("hh:mm a"),systemImage: "clock")
+                    .font(.caption)
+                    .foregroundColor(.black)
+            })
+            .padding(15)
+            .hSpacing(.leading)
+            .background(item.tagColor,in: .rect(topLeadingRadius: 15,bottomLeadingRadius: 15))
+            .strikethrough(item.isFinish,pattern:.solid,color: .black)
+            .offset(y:-8)
+
 
         }
         .hSpacing(.leading)
