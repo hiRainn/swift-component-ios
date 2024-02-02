@@ -23,13 +23,13 @@ struct TimeLineView: View {
     @ViewBuilder
     func TimeLineView() -> some View {
         if self.dataList.count != 0 {
-            ScrollViewReader { scrollViewProxy in 
+            ScrollViewReader { scrollViewProxy in
                 ScrollView{
                     VStack(spacing:20) {
-                        ForEach(self.dataList) { item in
-                            TimeLineItem(item)
+                        ForEach(self.dataList.indices,id:\.self) { index in
+                            TimeLineItem(item:self.$dataList[index])
                                 .background(alignment: .leading) {
-                                    if dataList.last?.id != item.id {
+                                    if dataList.last?.id != self.dataList[index].id {
                                         Rectangle()
                                             .frame(width: 1)
                                             .offset(x:8)
@@ -50,34 +50,48 @@ struct TimeLineView: View {
         }
     }
 
-    @ViewBuilder
-    func TimeLineItem(_ item: SomeData) -> some View {
-        HStack(alignment: .top,spacing: 15) {
-            Circle()
-                .fill(.blue)
-                .frame(width: 10,height: 10)
-                .padding(4)
-                .background(.white.shadow(.drop(color:.black.opacity(0.1),radius: 3)))
 
-            VStack(alignment: .leading, spacing: 8,content: {
-                Text(item.title)
-                    .fontWeight(.semibold)
-                    .foregroundStyle(item.isFinish ? .gray : .black)
+    struct TimeLineItem: View {
+        @Binding var item: SomeData
+        var body: some View {
+            HStack(alignment: .top,spacing: 15) {
+                Circle()
+                    .fill(item.isFinish ? .green : .blue)
+                    .frame(width: 10,height: 10)
+                    .padding(4)
+                    .background(.white.shadow(.drop(color:.black.opacity(0.1),radius: 3)),in:.circle)
+                    .overlay{
+                        Circle()
+                            .frame(width: 50,height: 50)
+                            .blendMode(.destinationOver)
+                            .onTapGesture() {
+                                withAnimation(.snappy) {
+                                    item.isFinish.toggle()
+                                }
+                            }
+                    }
 
-                Label(item.createAt.format("hh:mm a"),systemImage: "clock")
-                    .font(.caption)
-                    .foregroundColor(.black)
-            })
-            .padding(15)
+                VStack(alignment: .leading, spacing: 8,content: {
+                    Text(item.title)
+                        .fontWeight(.semibold)
+                        .foregroundStyle(item.isFinish ? .gray : .black)
+
+                    Label(item.createAt.format("hh:mm a"),systemImage: "clock")
+                        .font(.caption)
+                        .foregroundColor(.black)
+                })
+                .padding(15)
+                .hSpacing(.leading)
+                .background(item.tagColor,in: .rect(topLeadingRadius: 15,bottomLeadingRadius: 15))
+                .strikethrough(item.isFinish,pattern:.solid,color: .black)
+                .offset(y:-8)
+            }
             .hSpacing(.leading)
-            .background(item.tagColor,in: .rect(topLeadingRadius: 15,bottomLeadingRadius: 15))
-            .strikethrough(item.isFinish,pattern:.solid,color: .black)
-            .offset(y:-8)
-
-
         }
-        .hSpacing(.leading)
+
     }
+
+
 
     
 
