@@ -23,7 +23,7 @@ struct TimeLineView: View {
     @ViewBuilder
     func TimeLineView() -> some View {
         if self.dataList.count != 0 {
-            ScrollViewReader { scrollViewProxy in
+            ScrollViewReader { scrollViewProxy in 
                 ScrollView{
                     VStack(spacing:20) {
                         ForEach(self.dataList) { item in

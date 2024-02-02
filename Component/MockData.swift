@@ -23,13 +23,13 @@ var today: Date = .init()
 var DataList: [SomeData] = []
 
 let SelfColor: [Color] = [
-    Color(red: 247/255, green: 247/255, blue: 144/255),
-    Color(red: 187/255, green: 255/255, blue: 255/255),
-    Color(red: 160/255, green: 214/255, blue: 160/255),
-    Color(red: 221/255, green: 119/255, blue: 221/255),
-    Color(red: 235/255, green: 122/255, blue: 122/255),
-    Color(red: 105/255, green: 105/255, blue: 201/255),
-    Color(red: 255/255, green: 250/255, blue: 250/255),
+    Color(red: 183/255, green: 219/255, blue: 240/255),
+    Color(red: 183/255, green: 232/255, blue: 229/255),
+    Color(red: 236/255, green: 228/255, blue: 243/255),
+    Color(red: 283/255, green: 232/255, blue: 229/255),
+    Color(red: 245/255, green: 226/255, blue: 166/255),
+    Color(red: 243/255, green: 184/255, blue: 176/255),
+    Color(red: 183/255, green: 232/255, blue: 229/255),
 ]
 
 //mock database data
