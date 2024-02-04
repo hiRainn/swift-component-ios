@@ -16,7 +16,6 @@ struct TimeLineView: View {
         }
         .onAppear{
             onAppearEvent()
-
         }
     }
 
