@@ -51,6 +51,7 @@ struct TimeLineView: View {
 
 
     struct TimeLineItem: View {
+        //binding item to change data
         @Binding var item: SomeData
         var body: some View {
             HStack(alignment: .top,spacing: 15) {
