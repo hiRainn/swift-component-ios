@@ -49,7 +49,7 @@ struct TimeLineView: View {
         }
     }
 
-
+    //timeline item
     struct TimeLineItem: View {
         //binding item to change data
         @Binding var item: SomeData
