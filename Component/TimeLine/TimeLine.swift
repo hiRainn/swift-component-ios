@@ -91,10 +91,6 @@ struct TimeLineView: View {
 
     }
 
-
-
-    
-
     func onAppearEvent() {
         initDataList()
         self.dataList = initTimeLineData()
