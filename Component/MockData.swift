@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-
 struct SomeData: Identifiable {
     var id: UUID = .init()
     var title: String
