@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-
 struct TimeLineView: View {
     @State private var dataList: [SomeData] = []
 
