@@ -6,3 +6,10 @@
 //
 
 import SwiftUI
+struct SidebarMenu: View {
+    var body: some View {
+        VStack{
+            
+        }
+    }
+}
