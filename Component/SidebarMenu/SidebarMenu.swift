@@ -7,9 +7,13 @@
 
 import SwiftUI
 struct SidebarMenu: View {
+    @State private var showMenu: Bool = false
     var body: some View {
         VStack{
-            
+            Circle()
+                .onTapGesture {
+
+                }
         }
     }
 }
