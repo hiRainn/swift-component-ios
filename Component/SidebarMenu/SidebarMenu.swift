@@ -12,7 +12,7 @@ struct SidebarMenu: View {
         VStack{
             Circle()
                 .onTapGesture {
-
+                    self.showMenu = true
                 }
         }
     }
