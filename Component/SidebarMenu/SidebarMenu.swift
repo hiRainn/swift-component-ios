@@ -7,6 +7,7 @@
 
 import SwiftUI
 struct SidebarMenu: View {
+    //show menu
     @State private var showMenu: Bool = false
     var body: some View {
         VStack{
