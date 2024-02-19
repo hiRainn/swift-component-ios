@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+//sidebar menu view
 struct SidebarMenu: View {
     //show menu
     @State private var showMenu: Bool = false
