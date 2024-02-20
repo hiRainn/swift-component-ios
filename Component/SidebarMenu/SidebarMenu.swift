@@ -12,6 +12,9 @@ struct SidebarMenu: View {
     @State private var showMenu: Bool = false
     var body: some View {
         VStack{
+            HStack{
+                
+            }
             Circle()
                 .onTapGesture {
                     self.showMenu = true
@@ -19,3 +22,8 @@ struct SidebarMenu: View {
         }
     }
 }
+
+#Preview {
+    SidebarMenu()
+}
+
