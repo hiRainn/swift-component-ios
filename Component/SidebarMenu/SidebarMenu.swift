@@ -21,6 +21,8 @@ struct SidebarMenu: View {
                 }
         }
     }
+
+
 }
 
 #Preview {
