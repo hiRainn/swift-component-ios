@@ -100,4 +100,3 @@ struct TimeLineView: View {
 #Preview {
     TimeLineView()
 }
-
