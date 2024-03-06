@@ -8,3 +8,11 @@
 import SwiftUI
 
 
+struct SidebarData {
+
+}
+
+func initSidebarData() -> [SidebarData] {
+    var sidebar: [SidebarData] = []
+    return sidebar
+}
