@@ -8,11 +8,18 @@
 import SwiftUI
 
 
-struct SidebarData {
-
+struct SidebarData: Identifiable{
+    var id: UUID = .init()
+    var title: String
+    var link: String
 }
 
 func initSidebarData() -> [SidebarData] {
-    var sidebar: [SidebarData] = []
+    var sidebar: [SidebarData] = [
+        SidebarData(title: "title1", link: "link1"),
+        SidebarData(title: "title2", link: "link2"),
+        SidebarData(title: "title3", link: "link3"),
+        SidebarData(title: "title4", link: "link4"),
+    ]
     return sidebar
 }
