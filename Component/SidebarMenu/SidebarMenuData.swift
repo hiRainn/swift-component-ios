@@ -20,6 +20,7 @@ func initSidebarData() -> [SidebarData] {
         SidebarData(title: "title2", link: "link2"),
         SidebarData(title: "title3", link: "link3"),
         SidebarData(title: "title4", link: "link4"),
+        SidebarData(title: "title5", link: "link5"),
     ]
     return sidebar
 }
