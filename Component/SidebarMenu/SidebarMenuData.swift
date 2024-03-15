@@ -11,7 +11,7 @@ import SwiftUI
 struct SidebarData: Identifiable{
     var id: UUID = .init()
     var title: String
-    var link: String  
+    var link: String
 }
 
 func initSidebarData() -> [SidebarData] {
